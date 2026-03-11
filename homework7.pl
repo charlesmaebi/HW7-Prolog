@@ -158,6 +158,8 @@ eligibleCourses(Student, CourseList, Count) :-
     length(CourseList,Count).
 
 % Problem 6 - totalPassedCredits(Student, Total)
+% Find the total number of credits from all passed
+% classes by storing to list then sum
 totalPassedCredits(Student, Total) :-
     findall(
         Credits,
@@ -166,6 +168,9 @@ totalPassedCredits(Student, Total) :-
     sum_list(AllCredits, Total).
 
 % Problem 7 - proSchool(Student)
+% Manually checks if student has passed
+% all required classes, and if their 
+% number of credits is > 29
 proSchool(Student) :-
     passed(Student, engr103),
     passed(Student, cs162),
