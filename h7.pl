@@ -1,6 +1,6 @@
 % hw7template.pl
-% Name: ____________________________
-% Date: ____________________________
+% Name: Charles Aebi
+% Date: 3/11/26
 % CS 381 - Homework 7: Course Planning Advisor in Prolog
 %
 % Submit this file as: homework7.pl
@@ -109,37 +109,67 @@ took(carla, cs381, b).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Problem 1 - passed(Student, Course)
-passed(_Student, _Course) :-
-    % TODO
-    fail.
+passed(Student, Course) :- took(Student, Course, a).
+passed(Student, Course) :- took(Student, Course, b).
+passed(Student, Course) :- took(Student, Course, c).
+
 
 % Problem 2 - needs(Course, Req)
-needs(_Course, _Req) :-
-    % TODO
-    fail.
+% Base case
+needs(Course, Req) :-
+    prereq(Course, Req).
+
+% Recursive case for transitive closure
+needs(Course, Req) :- 
+    prereq(Course, Mid),
+    needs(Mid, Req).
+    
 
 % Problem 3 - eligible(Student, Course)
-eligible(_Student, _Course) :-
-    % TODO
-    fail.
+% Student eligable if...
+% course exists,
+% student has not already passed it
+% student has passed all prereqs
+eligible(Student, Course) :-
+    course(Course),
+    \+ passed(Student, Course),
+    \+ (needs(Course, Req), \+ passed(Student, Req)).
+
 
 % Problem 4 - whyNotEligible(Student, Course, Reason)
-whyNotEligible(_Student, _Course, _Reason) :-
-    % TODO
-    fail.
 
+% Clause for reason 1: already passed
+whyNotEligible(Student, Course, already_passed) :-
+    passed(Student, Course).
+
+% Clause for reason 2: missing a req
+whyNotEligible(Student, Course, missing(Req)) :-
+    needs(Course, Req),
+    \+ passed(Student, Req).
+    
 % Problem 5 - eligibleCourses(Student, CourseList, Count)
 % IMPORTANT: eligibleCourses/3 (three arguments)
-eligibleCourses(_Student, _CourseList, _Count) :-
-    % TODO
-    fail.
+% Finds all courses a student is eligible for
+eligibleCourses(Student, CourseList, Count) :-
+    findall(
+        Course, 
+        eligible(Student, Course),
+        CourseList),
+    length(CourseList,Count).
 
 % Problem 6 - totalPassedCredits(Student, Total)
-totalPassedCredits(_Student, _Total) :-
-    % TODO
-    fail.
+totalPassedCredits(Student, Total) :-
+    findall(
+        Credits,
+        (passed(Student, Course), credits(Course, Credits)),
+        AllCredits),
+    sum_list(AllCredits, Total).
 
 % Problem 7 - proSchool(Student)
-proSchool(_Student) :-
-    % TODO
-    fail.
+proSchool(Student) :-
+    passed(Student, engr103),
+    passed(Student, cs162),
+    passed(Student, cs261),
+    passed(Student, math251),
+    totalPassedCredits(Student, T),
+    T > 29. 
